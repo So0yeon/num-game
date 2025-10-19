@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5학년 역사 브루마블</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        /* 로비 화면 */
+        .lobby {
+            text-align: center;
+        }
+
+        .room-section {
+            margin: 30px 0;
+        }
+
+        .room-input {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        input {
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            width: 200px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+
+        /* 대기실 */
+        .waiting-room {
+            display: none;
+        }
+
+        .room-code {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed #667eea;
+        }
+
+        .room-code h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .code {
+            font-size: 2em;
+            font-weight: bold;
+            color: #764ba2;
+            letter-spacing: 3px;
+        }
+
+        .players-list {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .player-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* 게임 화면 */
+        .game-screen {
+            display: none;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .player-status {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .current-turn {
+            border: 3px solid gold;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .board {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .track {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .cell {
+            flex: 1;
+            min-width: 50px;
+            height: 80px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            position: relative;
+            padding: 5px;
+        }
+
+        .cell.start {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            font-weight: bold;
+        }
+
+        .cell.finish {
+            background: linear-gradient(135deg, #f6ad55, #ed8936);
+            color: white;
+            font-weight: bold;
+        }
+
+        .cell-number {
+            font-size: 0.7em;
+            color: #666;
+        }
+
+        .cell-players {
+            display: flex;
+            gap: 3px;
+            position: absolute;
+            bottom: 5px;
+        }
+
+        .player-piece {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .dice-area {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .dice {
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            font-size: 3em;
+            line-height: 80px;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .dice.rolling {
+            animation: roll 0.5s infinite;
+        }
+
+        @keyframes roll {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(90deg); }
+            50% { transform: rotate(180deg); }
+            75% { transform: rotate(270deg); }
+        }
+
+        /* 퀴즈 모달 */
+        .quiz-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .quiz-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .quiz-question {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .quiz-option {
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            background: white;
+            font-size: 1.1em;
+        }
+
+        .quiz-option:hover {
+            background: #f7fafc;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .quiz-option.correct {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+        }
+
+        .quiz-option.wrong {
+            background: #f56565;
+            color: white;
+            border-color: #f56565;
+        }
+
+        .result-message {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .result-message.correct {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .result-message.wrong {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* 승리 화면 */
+        .winner-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        .winner-content {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            animation: celebrate 0.5s;
+        }
+
+        @keyframes celebrate {
+            0% { transform: scale(0.5); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .winner-content h2 {
+            font-size: 3em;
+            color: #f6ad55;
+            margin-bottom: 20px;
+        }
+
+        .winner-name {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 5학년 역사 브루마블</h1>
+        <p class="subtitle">친구들과 함께 역사 퀴즈를 풀며 경쟁해보세요!</p>
+
+        <!-- 로비 화면 -->
+        <div class="lobby" id="lobby">
+            <div class="room-section">
+                <h2>🎮 게임 시작하기</h2>
+                <div class="room-input">
+                    <input type="text" id="playerName" placeholder="이름을 입력하세요" maxlength="10">
+                </div>
+                <button class="btn-primary" onclick="createRoom()">새 방 만들기</button>
+            </div>
+
+            <div class="room-section">
+                <h3>또는</h3>
+                <div class="room-input">
+                    <input type="text" id="roomCode" placeholder="방 코드 입력" maxlength="6">
+                    <button class="btn-secondary" onclick="joinRoom()">방 참가하기</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 대기실 -->
+        <div class="waiting-room" id="waitingRoom">
+            <div class="room-code">
+                <h3>🔑 방 코드</h3>
+                <div class="code" id="displayRoomCode"></div>
+                <p style="margin-top: 10px; color: #666;">친구들에게 이 코드를 공유하세요!</p>
+            </div>
+
+            <div class="players-list">
+                <h3>👥 참가자 목록</h3>
+                <div id="playersList"></div>
+            </div>
+
+            <button class="btn-primary" onclick="startGame()" id="startButton">게임 시작</button>
+            <button class="btn-secondary" onclick="leaveRoom()" style="margin-left: 10px;">나가기</button>
+        </div>
+
+        <!-- 게임 화면 -->
+        <div class="game-screen" id="gameScreen">
+            <div class="game-info" id="playersInfo"></div>
+
+            <div class="board">
+                <div class="track" id="track"></div>
+            </div>
+
+            <div class="dice-area">
+                <div class="dice" id="dice">🎲</div>
+                <div style="margin-top: 20px;">
+                    <button class="btn-primary" onclick="rollDice()" id="rollButton">주사위 굴리기</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 퀴즈 모달 -->
+        <div class="quiz-modal" id="quizModal">
+            <div class="quiz-content">
+                <h2 style="margin-bottom: 20px; color: #667eea;">📚 역사 퀴즈</h2>
+                <div class="quiz-question" id="quizQuestion"></div>
+                <div class="quiz-options" id="quizOptions"></div>
+                <div class="result-message hidden" id="resultMessage"></div>
+            </div>
+        </div>
+
+        <!-- 승리 모달 -->
+        <div class="winner-modal" id="winnerModal">
+            <div class="winner-content">
+                <h2>🏆 승리!</h2>
+                <div class="winner-name" id="winnerName"></div>
+                <button class="btn-primary" onclick="resetGame()">다시 하기</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase 설정 (여기에 본인의 Firebase 설정을 넣으세요)
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, onValue, update, remove, push, onDisconnect } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // ⚠️ 중요: 아래 설정을 본인의 Firebase 프로젝트 설정으로 교체하세요
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDatabaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Firebase 초기화
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // 게임 상태
+        let currentRoomCode = null;
+        let currentPlayerId = null;
+        let currentPlayerName = null;
+        let gameState = null;
+
+        // 플레이어 색상
+        const playerColors = ['#e53e3e', '#3182ce', '#38a169', '#d69e2e'];
+
+        // 역사 퀴즈 데이터
+        const quizzes = [
+            {
+                question: "고조선을 세운 인물은 누구인가요?",
+                options: ["세종대왕", "단군왕검", "이성계", "광개토대왕"],
+                answer: 1
+            },
+            {
+                question: "삼국시대의 세 나라가 아닌 것은?",
+                options: ["고구려", "백제", "신라", "고려"],
+                answer: 3
+            },
+            {
+                question: "불국사와 석굴암을 만든 나라는?",
+                options: ["고구려", "백제", "신라", "조선"],
+                answer: 2
+            },
+            {
+                question: "팔만대장경을 만든 나라는?",
+                options: ["고려", "조선", "신라", "백제"],
+                answer: 0
+            },
+            {
+                question: "한글을 창제한 왕은?",
+                options: ["태조 이성계", "세종대왕", "광해군", "정조"],
+                answer: 1
+            },
+            {
+                question: "임진왜란 때 활약한 수군 장군은?",
+                options: ["이순신", "강감찬", "을지문덕", "김유신"],
+                answer: 0
+            },
+            {
+                question: "거북선을 처음 만든 사람은?",
+                options: ["장영실", "이순신", "정약용", "김정호"],
+                answer: 1
+            },
+            {
+                question: "고려를 건국한 인물은?",
+                options: ["왕건", "이성계", "광종", "태조"],
+                answer: 0
+            },
+            {
+                question: "직지심체요절은 무엇인가요?",
+                options: ["불교 책", "금속활자본", "그림", "지도"],
+                answer: 1
+            },
+            {
+                question: "신라의 화랑도는 무엇을 했나요?",
+                options: ["장사", "청소년 교육", "농사", "전쟁"],
+                answer: 1
+            }
+        ];
+
+        // 방 생성
+        window.createRoom = function() {
+            const playerName = document.getElementById('playerName').value.trim();
+            if (!playerName) {
+                alert('이름을 입력해주세요!');
+                return;
+            }
+
+            currentPlayerName = playerName;
+            currentRoomCode = generateRoomCode();
+            currentPlayerId = generatePlayerId();
+
+            const roomRef = ref(database, `rooms/${currentRoomCode}`);
+            
+            set(roomRef, {
+                host: currentPlayerId,
+                status: 'waiting',
+                players: {
+                    [currentPlayerId]: {
+                        name: playerName,
+                        position: 0,
+                        colorIndex: 0
+                    }
+                },
+                createdAt: Date.now()
+            }).then(() => {
+                setupDisconnect();
+                showWaitingRoom();
+                listenToRoom();
+            });
+        };
+
+        // 방 참가
+        window.joinRoom = function() {
+            const playerName = document.getElementById('playerName').value.trim();
+            const roomCode = document.getElementById('roomCode').value.trim().toUpperCase();
+            
+            if (!playerName) {
+                alert('이름을 입력해주세요!');
+                return;
+            }
+            
+            if (!roomCode) {
+                alert('방 코드를 입력해주세요!');
+                return;
+            }
+
+            currentPlayerName = playerName;
+            currentRoomCode = roomCode;
+            currentPlayerId = generatePlayerId();
+
+            const roomRef = ref(database, `rooms/${roomCode}`);
+            
+            onValue(roomRef, (snapshot) => {
+                const room = snapshot.val();
+                
+                if (!room) {
+                    alert('존재하지 않는 방입니다!');
+                    return;
+                }
+
+                if (room.status !== 'waiting') {
+                    alert('이미 게임이 시작된 방입니다!');
+                    return;
+                }
+
+                const playerCount = Object.keys(room.players || {}).length;
+                
+                if (playerCount >= 4) {
+                    alert('방이 가득 찼습니다!');
+                    return;
+                }
+
+                const playerRef = ref(database, `rooms/${roomCode}/players/${currentPlayerId}`);
+                set(playerRef, {
+                    name: playerName,
+                    position: 0,
+                    colorIndex: playerCount
+                }).then(() => {
+                    setupDisconnect();
+                    showWaitingRoom();
+                    listenToRoom();
+                });
+            }, { onlyOnce: true });
+        };
+
+        // 게임 시작
+        window.startGame = function() {
+            if (!gameState || !gameState.players) return;
+            
+            const playerCount = Object.keys(gameState.players).length;
+            if (playerCount < 2) {
+                alert('최소 2명 이상의 플레이어가 필요합니다!');
+                return;
+            }
+
+            const playerIds = Object.keys(gameState.players);
+            
+            update(ref(database, `rooms/${currentRoomCode}`), {
+                status: 'playing',
+                currentTurn: 0,
+                playerOrder: playerIds
+            });
+        };
+
+        // 방 나가기
+        window.leaveRoom = function() {
+            if (currentRoomCode && currentPlayerId) {
+                remove(ref(database, `rooms/${currentRoomCode}/players/${currentPlayerId}`));
+                
+                if (gameState && gameState.host === currentPlayerId) {
+                    remove(ref(database, `rooms/${currentRoomCode}`));
+                }
+            }
+            
+            location.reload();
+        };
+
+        // 주사위 굴리기
+        window.rollDice = function() {
+            if (!isMyTurn()) {
+                alert('당신의 차례가 아닙니다!');
+                return;
+            }
+
+            document.getElementById('rollButton').disabled = true;
+            const diceEl = document.getElementById('dice');
+            diceEl.classList.add('rolling');
+
+            setTimeout(() => {
+                const roll = Math.floor(Math.random() * 6) + 1;
+                diceEl.textContent = roll;
+                diceEl.classList.remove('rolling');
+
+                showQuiz(roll);
+            }, 1000);
+        };
+
+        // 퀴즈 표시
+        function showQuiz(diceRoll) {
+            const quiz = quizzes[Math.floor(Math.random() * quizzes.length)];
+            
+            document.getElementById('quizQuestion').textContent = quiz.question;
+            
+            const optionsDiv = document.getElementById('quizOptions');
+            optionsDiv.innerHTML = '';
+            
+            quiz.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(index, quiz.answer, diceRoll);
+                optionsDiv.appendChild(btn);
+            });
+
+            document.getElementById('resultMessage').classList.add('hidden');
+            document.getElementById('quizModal').style.display = 'flex';
+        }
+
+        // 정답 확인
+        function checkAnswer(selected, correct, diceRoll) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+            
+            const resultDiv = document.getElementById('resultMessage');
+            
+            if (selected === correct) {
+                options[selected].classList.add('correct');
+                resultDiv.textContent = '정답입니다! 🎉';
+                resultDiv.className = 'result-message correct';
+                resultDiv.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    movePlayer(diceRoll);
+                    closeQuizModal();
+                }, 2000);
+            } else {
+                options[selected].classList.add('wrong');
+                options[correct].classList.add('correct');
+                resultDiv.textContent = '틀렸습니다! 😢 이동하지 못합니다.';
+                resultDiv.className = 'result-message wrong';
+                resultDiv.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    closeQuizModal();
+                    nextTurn();
+                }, 2000);
+            }
+        }
+
+        // 플레이어 이동
+        function movePlayer(steps) {
+            const newPosition = Math.min(gameState.players[currentPlayerId].position + steps, 19);
+            
+            update(ref(database, `rooms/${currentRoomCode}/players/${currentPlayerId}`), {
+                position: newPosition
+            }).then(() => {
+                if (newPosition >= 19) {
+                    showWinner();
+                } else {
+                    nextTurn();
+                }
+            });
+        }
+
+        // 다음 턴
+        function nextTurn() {
+            const nextTurn = (gameState.currentTurn + 1) % gameState.playerOrder.length;
+            update(ref(database, `rooms/${currentRoomCode}`), {
+                currentTurn: nextTurn
+            });
+        }
+
+        // 승자 표시
+        function showWinner() {
+            document.getElementById('winnerName').textContent = currentPlayerName;
+            document.getElementById('winnerModal').style.display = 'flex';
+            
+            update(ref(database, `rooms/${currentRoomCode}`), {
+                status: 'finished',
+                winner: currentPlayerId
+            });
+        }
+
+        // 게임 리셋
+        window.resetGame = function() {
+            location.reload();
+        };
+
+        // 퀴즈 모달 닫기
+        function closeQuizModal() {
+            document.getElementById('quizModal').style.display = 'none';
+            document.getElementById('rollButton').disabled = false;
+        }
+
+        // 내 턴인지 확인
+        function isMyTurn() {
+            if (!gameState || !gameState.playerOrder) return false;
+            return gameState.playerOrder[gameState.currentTurn] === currentPlayerId;
+        }
+
+        // 방 상태 리스닝
+        function listenToRoom() {
+            const roomRef = ref(database, `rooms/${currentRoomCode}`);
+            
+            onValue(roomRef, (snapshot) => {
+                gameState = snapshot.val();
+                
+                if (!gameState) {
+                    alert('방이 삭제되었습니다.');
+                    location.reload();
+                    return;
+                }
+
+                if (gameState.status === 'waiting') {
+                    updateWaitingRoom();
+                } else if (gameState.status === 'playing') {
+                    showGameScreen();
+                    updateGameScreen();
+                }
+            });
+        }
+
+        // 대기실 업데이트
+        function updateWaitingRoom() {
+            const playersDiv = document.getElementById('playersList');
+            playersDiv.innerHTML = '';
+            
+            Object.entries(gameState.players || {}).forEach(([id, player]) => {
+                const div = document.createElement('div');
+                div.className = 'player-item';
+                div.innerHTML = `
+                    <div class="player-color" style="background-color: ${playerColors[player.colorIndex]}"></div>
+                    <span>${player.name}</span>
+                    ${id === gameState.host ? ' 👑' : ''}
+                `;
+                playersDiv.appendChild(div);
+            });
+
+            document.getElementById('startButton').style.display = 
+                currentPlayerId === gameState.host ? 'inline-block' : 'none';
+        }
+
+        // 게임 화면 표시
+        function showGameScreen() {
+            document.getElementById('lobby').style.display = 'none';
+            document.getElementById('waitingRoom').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            
+            // 보드 생성 (한 번만)
+            const track = document.getElementById('track');
+            if (track.children.length === 0) {
+                for (let i = 0; i <= 19; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.id = `cell-${i}`;
+                    
+                    if (i === 0) {
+                        cell.classList.add('start');
+                        cell.innerHTML = '<div>출발</div>';
+                    } else if (i === 19) {
+                        cell.classList.add('finish');
+                        cell.innerHTML = '<div>도착</div>';
+                    } else {
+                        cell.innerHTML = `<div class="cell-number">${i}</div>`;
+                    }
+                    
+                    const playersDiv = document.createElement('div');
+                    playersDiv.className = 'cell-players';
+                    cell.appendChild(playersDiv);
+                    
+                    track.appendChild(cell);
+                }
+            }
+        }
+
+        // 게임 화면 업데이트
+        function updateGameScreen() {
+            // 플레이어 상태 업데이트
+            const infoDiv = document.getElementById('playersInfo');
+            infoDiv.innerHTML = '';
+            
+            gameState.playerOrder.forEach((id, index) => {
+                const player = gameState.players[id];
+                const div = document.createElement('div');
+                div.className = 'player-status';
+                div.style.backgroundColor = playerColors[player.colorIndex];
+                
+                if (index === gameState.currentTurn) {
+                    div.classList.add('current-turn');
+                }
+                
+                div.innerHTML = `
+                    <div>${player.name}</div>
+                    <div style="font-size: 0.9em;">위치: ${player.position}/19</div>
+                `;
+                infoDiv.appendChild(div);
+            });
+
+            // 보드 위 플레이어 위치 업데이트
+            document.querySelectorAll('.cell-players').forEach(el => el.innerHTML = '');
+            
+            gameState.playerOrder.forEach(id => {
+                const player = gameState.players[id];
+                const cell = document.getElementById(`cell-${player.position}`);
+                const playersDiv = cell.querySelector('.cell-players');
+                
+                const piece = document.createElement('div');
+                piece.className = 'player-piece';
+                piece.style.backgroundColor = playerColors[player.colorIndex];
+                playersDiv.appendChild(piece);
+            });
+
+            // 주사위 버튼 활성화/비활성화
+            document.getElementById('rollButton').disabled = !isMyTurn();
+        }
+
+        // 대기실 표시
+        function showWaitingRoom() {
+            document.getElementById('lobby').style.
